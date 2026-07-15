@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ONGC AI Knowledge Assistant</title>
+    <!-- Google Fonts: Inter and Outfit -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- FontAwesome for Premium Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- App Styling -->
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="brand">
+                <div class="logo-container">
+                    <span class="logo-symbol">O</span>
+                    <span class="logo-symbol gold">N</span>
+                    <span class="logo-symbol">G</span>
+                    <span class="logo-symbol gold">C</span>
+                </div>
+                <div class="brand-text">
+                    <h1>ONGC Assistant</h1>
+                    <p>Enterprise AI RAG</p>
+                </div>
+            </div>
+
+            <!-- Navigation Links -->
+            <nav class="nav-menu">
+                <a href="#" class="nav-item active" data-tab="chat-view">
+                    <i class="fa-solid fa-comments"></i>
+                    <span>Chat Hub</span>
+                </a>
+                <a href="#" class="nav-item" data-tab="docs-view">
+                    <i class="fa-solid fa-file-pdf"></i>
+                    <span>Documents</span>
+                </a>
+                <a href="#" class="nav-item" data-tab="analytics-view">
+                    <i class="fa-solid fa-chart-pie"></i>
+                    <span>Analytics</span>
+                </a>
+                <a href="#" class="nav-item" data-tab="settings-view">
+                    <i class="fa-solid fa-sliders"></i>
+                    <span>Settings</span>
+                </a>
+            </nav>
+
+            <!-- Chat Sessions List -->
+            <div class="session-section">
+                <div class="session-header">
+                    <span>Active Sessions</span>
+                    <button id="new-chat-btn" title="Start New Chat">
+                        <i class="fa-solid fa-plus"></i>
+                    </button>
+                </div>
+                <div class="session-list" id="session-list">
+                    <!-- Dynamic sessions load here -->
+                </div>
+            </div>
+
+            <!-- User Status & Theme Toggle -->
+            <div class="sidebar-footer">
+                <div class="theme-switch" id="theme-toggle">
+                    <i class="fa-solid fa-moon"></i>
+                    <span>Dark Mode</span>
+                </div>
+                <div class="user-profile">
+                    <div class="avatar"><i class="fa-solid fa-user-shield"></i></div>
+                    <div class="user-info">
+                        <span class="username">ONGC Intern</span>
+                        <span class="status-badge"><span class="dot"></span>Online</span>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <!-- Top Header -->
+            <header class="app-header">
+                <div class="header-left">
+                    <h2 id="view-title">Chat Hub</h2>
+                    <p id="view-subtitle">Access corporate documents via local AI</p>
+                </div>
+                <div class="header-right">
+                    <div class="server-status">
+                        <span class="status-indicator active"></span>
+                        <span class="status-text">Ollama Active</span>
+                    </div>
+                </div>
+            </header>
+
+            <!-- View 1: Chat interface -->
+            <section id="chat-view" class="view-panel active">
+                <div class="chat-wrapper">
+                    <!-- Chat feed -->
+                    <div class="chat-feed" id="chat-feed">
+                        <!-- Welcome message -->
+                        <div class="welcome-box">
+                            <div class="welcome-icon">
+                                <i class="fa-solid fa-microchip"></i>
+                            </div>
+                            <h3>Welcome to ONGC AI Knowledge Assistant</h3>
+                            <p>Query policies, rules, and manuals from our indexed PDF knowledge base. To get started, ask a question or check the suggestions below.</p>
+                            
+                            <div class="suggestions-grid">
+                                <button class="suggest-card" data-prompt="What is the role of Policy Monitoring and Control (PMC) Section?">
+                                    <i class="fa-solid fa-compass"></i>
+                                    <span>PMC Section Role</span>
+                                </button>
+                                <button class="suggest-card" data-prompt="What is the inventory level check policy for materials procurement?">
+                                    <i class="fa-solid fa-boxes-stacked"></i>
+                                    <span>Inventory Check Policy</span>
+                                </button>
+                                <button class="suggest-card" data-prompt="Where and when is the Integrated Materials Management Manual applicable?">
+                                    <i class="fa-solid fa-book-open"></i>
+                                    <span>Manual Applicability</span>
+                                </button>
+                                <button class="suggest-card" data-prompt="Who is responsible for reviewing tender documents?">
+                                    <i class="fa-solid fa-gavel"></i>
+                                    <span>Tender Document Review</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Input zone -->
+                    <div class="chat-input-container">
+                        <div class="input-actions-bar">
+                            <div class="current-model-info">
+                                <i class="fa-solid fa-robot"></i>
+                                <span id="chat-active-model">Llama 3.2 (1B)</span>
+                            </div>
+                            <div class="voice-actions">
+                                <button id="voice-input-btn" class="input-btn" title="Speak question">
+                                    <i class="fa-solid fa-microphone"></i>
+                                </button>
+                                <button id="voice-output-toggle" class="input-btn" title="Enable text-to-speech auto-read">
+                                    <i class="fa-solid fa-volume-mute"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <form class="input-form" id="chat-form">
+                            <textarea id="chat-input" placeholder="Ask about ONGC manuals..." rows="1" required></textarea>
+                            <button type="submit" id="send-btn" title="Send Message">
+                                <i class="fa-solid fa-paper-plane"></i>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </section>
+
+            <!-- View 2: Documents Manager -->
+            <section id="docs-view" class="view-panel">
+                <div class="panel-card doc-uploader">
+                    <div class="card-header">
+                        <h3><i class="fa-solid fa-cloud-arrow-up"></i> Ingest New Manual</h3>
+                        <p>Upload new PDF guidelines or manuals to expand the chatbot's knowledge base. Files will be parsed, split, embedded, and indexed automatically.</p>
+                    </div>
+                    
+                    <div class="upload-zone" id="upload-zone">
+                        <input type="file" id="file-input" accept=".pdf" style="display: none;">
+                        <i class="fa-solid fa-file-pdf upload-icon"></i>
+                        <p class="upload-text">Drag & drop your PDF file here, or <span class="highlight">browse files</span></p>
+                        <p class="upload-hint">Only PDF documents are supported (Max 50MB)</p>
+                        <div class="progress-bar-container" id="upload-progress-container">
+                            <div class="progress-bar" id="upload-progress">0%</div>
+                        </div>
+                    </div>
+                    
+                    <div class="alert-box" id="upload-alert" style="display: none;">
+                        <!-- Alerts render here -->
+                    </div>
+                </div>
+
+                <div class="panel-card doc-list-card">
+                    <div class="card-header">
+                        <h3><i class="fa-solid fa-database"></i> Currently Indexed Documents</h3>
+                        <p>The vector database currently contains information from the following files.</p>
+                    </div>
+                    
+                    <div class="table-container">
+                        <table class="doc-table">
+                            <thead>
+                                <tr>
+                                    <th>Document Title</th>
+                                    <th>Source Type</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="document-table-body">
+                                <!-- Documents rows render here -->
+                                <tr>
+                                    <td colspan="3" class="text-center">Loading document registry...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- View 3: Analytics Dashboard -->
+            <section id="analytics-view" class="view-panel">
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon purple"><i class="fa-solid fa-comments"></i></div>
+                        <div class="stat-info">
+                            <span class="stat-value" id="stat-total-chats">0</span>
+                            <span class="stat-label">Total Queries</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon green"><i class="fa-solid fa-thumbs-up"></i></div>
+                        <div class="stat-info">
+                            <span class="stat-value" id="stat-likes">0</span>
+                            <span class="stat-label">Helpful Votes</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon red"><i class="fa-solid fa-thumbs-down"></i></div>
+                        <div class="stat-info">
+                            <span class="stat-value" id="stat-dislikes">0</span>
+                            <span class="stat-label">Unhelpful Votes</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon gold"><i class="fa-solid fa-face-smile"></i></div>
+                        <div class="stat-info">
+                            <span class="stat-value" id="stat-satisfaction">N/A</span>
+                            <span class="stat-label">Satisfaction Rate</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="analytics-layout">
+                    <!-- Feedback details -->
+                    <div class="panel-card comments-card">
+                        <div class="card-header">
+                            <h3><i class="fa-solid fa-comment-dots"></i> User Comments Feed</h3>
+                            <p>Latest feedback submitted by users regarding response accuracy.</p>
+                        </div>
+                        <div class="comments-feed" id="comments-feed">
+                            <div class="empty-state">No comments submitted yet.</div>
+                        </div>
+                    </div>
+
+                    <!-- Recent logs -->
+                    <div class="panel-card log-card">
+                        <div class="card-header">
+                            <h3><i class="fa-solid fa-clock-rotate-left"></i> Recent Activity Log</h3>
+                            <p>Most recent user questions and their ratings.</p>
+                        </div>
+                        <div class="log-feed" id="log-feed">
+                            <div class="empty-state">No activity logged yet.</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- View 4: Settings -->
+            <section id="settings-view" class="view-panel">
+                <div class="panel-card">
+                    <div class="card-header">
+                        <h3><i class="fa-solid fa-gears"></i> Model & Pipeline Configuration</h3>
+                        <p>Tune RAG parameters and select models to optimize performance.</p>
+                    </div>
+
+                    <div class="settings-form">
+                        <div class="setting-group">
+                            <label class="setting-label" for="setting-model">Active LLM Model</label>
+                            <p class="setting-desc">Choose from locally installed models. The 1B parameter model is fastest, while the latest model is most intelligent.</p>
+                            <select id="setting-model" class="setting-control">
+                                <!-- Loaded dynamically -->
+                                <option value="llama3.2:1b">llama3.2:1b (Loading...)</option>
+                            </select>
+                        </div>
+
+                        <div class="setting-group">
+                            <label class="setting-label">Temperature: <span id="temp-val">0.0</span></label>
+                            <p class="setting-desc">A lower temperature makes answers deterministic and focused, which is ideal for accurate document lookup. A higher temperature allows for more creative wording.</p>
+                            <input type="range" id="setting-temp" min="0.0" max="1.0" step="0.1" value="0.0" class="setting-slider">
+                        </div>
+
+                        <div class="setting-group">
+                            <label class="setting-label" for="setting-k">Document Retrieval K-Value</label>
+                            <p class="setting-desc">Number of text chunks to retrieve and inject into the prompt template. More chunks provide broader context but increase inference time.</p>
+                            <select id="setting-k" class="setting-control">
+                                <option value="3">3 Chunks</option>
+                                <option value="5" selected>5 Chunks</option>
+                                <option value="7">7 Chunks</option>
+                                <option value="10">10 Chunks</option>
+                            </select>
+                        </div>
+
+                        <div class="settings-actions">
+                            <button id="save-settings-btn" class="primary-btn">Save Configuration</button>
+                            <button id="clear-db-btn" class="danger-btn">Reset Sessions</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="panel-card info-card">
+                    <div class="card-header">
+                        <h3><i class="fa-solid fa-info-circle"></i> Pipeline Information</h3>
+                        <p>Current architecture parameters and framework details.</p>
+                    </div>
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <span class="info-label">Orchestration</span>
+                            <span class="info-value">LangChain (Python v3)</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Vector Store</span>
+                            <span class="info-value">ChromaDB (SQLite format)</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Embeddings Model</span>
+                            <span class="info-value">sentence-transformers/all-MiniLM-L6-v2</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Backend Framework</span>
+                            <span class="info-value">FastAPI + Uvicorn</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Feedback Modal -->
+    <div class="modal-overlay" id="feedback-modal">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h3>Submit Response Feedback</h3>
+                <button class="close-modal-btn" id="close-modal"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="modal-body">
+                <p>Help us improve response quality. Why did you rate this response as unhelpful?</p>
+                <textarea id="feedback-comment" placeholder="Provide details (e.g. 'Answers not in context', 'Missing page reference', 'Irrelevant facts'...)"></textarea>
+            </div>
+            <div class="modal-footer">
+                <button class="secondary-btn" id="cancel-feedback-btn">Cancel</button>
+                <button class="primary-btn" id="submit-feedback-btn">Submit Feedback</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="/static/app.js"></script>
+</body>
+</html>
