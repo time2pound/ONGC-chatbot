@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ONGC AI Knowledge Assistant</title>
+    <title>AI Knowledge Assistant</title>
     <!-- Google Fonts: Inter and Outfit -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <!-- FontAwesome for Premium Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- App Styling -->
@@ -19,13 +19,10 @@
         <aside class="sidebar">
             <div class="brand">
                 <div class="logo-container">
-                    <span class="logo-symbol">O</span>
-                    <span class="logo-symbol gold">N</span>
-                    <span class="logo-symbol">G</span>
-                    <span class="logo-symbol gold">C</span>
+                    <i class="fa-solid fa-brain" style="font-size: 20px; color: var(--brand-gold);"></i>
                 </div>
                 <div class="brand-text">
-                    <h1>ONGC Assistant</h1>
+                    <h1>AI Assistant</h1>
                     <p>Enterprise AI RAG</p>
                 </div>
             </div>
@@ -72,7 +69,7 @@
                 <div class="user-profile">
                     <div class="avatar"><i class="fa-solid fa-user-shield"></i></div>
                     <div class="user-info">
-                        <span class="username">ONGC Intern</span>
+                        <span class="username">Guest Intern</span>
                         <span class="status-badge"><span class="dot"></span>Online</span>
                     </div>
                 </div>
@@ -95,6 +92,8 @@
                 </div>
             </header>
 
+
+
             <!-- View 1: Chat interface -->
             <section id="chat-view" class="view-panel active">
                 <div class="chat-wrapper">
@@ -105,7 +104,7 @@
                             <div class="welcome-icon">
                                 <i class="fa-solid fa-microchip"></i>
                             </div>
-                            <h3>Welcome to ONGC AI Knowledge Assistant</h3>
+                            <h3>Welcome to AI Knowledge Assistant</h3>
                             <p>Query policies, rules, and manuals from our indexed PDF knowledge base. To get started, ask a question or check the suggestions below.</p>
                             
                             <div class="suggestions-grid">
@@ -146,7 +145,7 @@
                             </div>
                         </div>
                         <form class="input-form" id="chat-form">
-                            <textarea id="chat-input" placeholder="Ask about ONGC manuals..." rows="1" required></textarea>
+                            <textarea id="chat-input" placeholder="Ask about the manuals..." rows="1" required></textarea>
                             <button type="submit" id="send-btn" title="Send Message">
                                 <i class="fa-solid fa-paper-plane"></i>
                             </button>
@@ -262,6 +261,7 @@
                 </div>
             </section>
 
+
             <!-- View 4: Settings -->
             <section id="settings-view" class="view-panel">
                 <div class="panel-card">
@@ -290,8 +290,8 @@
                             <label class="setting-label" for="setting-k">Document Retrieval K-Value</label>
                             <p class="setting-desc">Number of text chunks to retrieve and inject into the prompt template. More chunks provide broader context but increase inference time.</p>
                             <select id="setting-k" class="setting-control">
-                                <option value="3">3 Chunks</option>
-                                <option value="5" selected>5 Chunks</option>
+                                <option value="3" selected>3 Chunks</option>
+                                <option value="5">5 Chunks</option>
                                 <option value="7">7 Chunks</option>
                                 <option value="10">10 Chunks</option>
                             </select>

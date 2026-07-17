@@ -2,24 +2,26 @@ import os
 import sqlite3
 import shutil
 from fastapi import FastAPI, File, UploadFile, Request, HTTPException
-from fastapi.responses import FileResponse, JSONResponse
+from fastapi.responses import FileResponse, JSONResponse, StreamingResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 from typing import Optional
 import httpx
 
 from app.config import OLLAMA_API_BASE, DEFAULT_LLM_MODEL, FEEDBACK_DB_PATH, DOCUMENTS_DIR
-from app.rag import run_rag_pipeline
+from app.rag import run_rag_pipeline, run_rag_pipeline_stream
 from utils.vectorstore import get_all_document_names, add_documents_to_db
 from utils.loader import load_and_split_pdf
 
 # Initialize FastAPI application
-app = FastAPI(title="ONGC Enterprise AI Chatbot", version="1.0.0")
+app = FastAPI(title="Enterprise AI Chatbot", version="1.0.0")
 
 # Setup templates and static file directories
 os.makedirs("templates", exist_ok=True)
 os.makedirs("static", exist_ok=True)
+os.makedirs(DOCUMENTS_DIR, exist_ok=True)
 app.mount("/static", StaticFiles(directory="static"), name="static")
+app.mount("/docs", StaticFiles(directory=DOCUMENTS_DIR), name="docs")
 
 # Initialize Feedback Database
 def init_feedback_db():
@@ -50,6 +52,7 @@ class ChatRequest(BaseModel):
     model: Optional[str] = DEFAULT_LLM_MODEL
     temperature: Optional[float] = 0.0
     session_id: Optional[str] = None
+    k: Optional[int] = 3
 
 class FeedbackRequest(BaseModel):
     session_id: Optional[str] = None
@@ -91,19 +94,22 @@ async def get_models():
 @app.post("/api/chat")
 async def chat(request: ChatRequest):
     """
-    Processes chat prompt through the RAG pipeline.
+    Processes chat prompt through the RAG pipeline with streaming.
     """
     if not request.question.strip():
         raise HTTPException(status_code=400, detail="Question cannot be empty.")
         
     try:
-        res = run_rag_pipeline(
-            question=request.question,
-            model_name=request.model,
-            temperature=request.temperature,
-            session_id=request.session_id
+        return StreamingResponse(
+            run_rag_pipeline_stream(
+                question=request.question,
+                model_name=request.model,
+                temperature=request.temperature,
+                session_id=request.session_id,
+                k=request.k
+            ),
+            media_type="text/event-stream"
         )
-        return res
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Internal server error: {str(e)}")
 
@@ -114,6 +120,7 @@ async def get_documents():
     """
     docs = get_all_document_names()
     return {"documents": docs}
+
 
 @app.post("/api/ingest")
 async def ingest_document(file: UploadFile = File(...)):

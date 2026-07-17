@@ -6,41 +6,41 @@
 
 /* Variables & Themes */
 :root[data-theme="dark"] {
-    --bg-primary: #0d0f14;
-    --bg-secondary: #131722;
-    --bg-tertiary: #1b2030;
-    --bg-input: #1a1e29;
-    --border-color: rgba(255, 255, 255, 0.08);
-    --border-hover: rgba(255, 255, 255, 0.15);
-    --text-primary: #f3f4f6;
-    --text-secondary: #9ca3af;
-    --text-muted: #6b7280;
-    --shadow-color: rgba(0, 0, 0, 0.5);
-    --glass-bg: rgba(19, 23, 34, 0.7);
-    --glass-border: rgba(255, 255, 255, 0.05);
+    --bg-primary: #191816;       /* Warm dark charcoal */
+    --bg-secondary: #22201e;     /* Stone dark card */
+    --bg-tertiary: #2b2825;
+    --bg-input: #2e2b28;
+    --border-color: rgba(214, 207, 196, 0.08);
+    --border-hover: rgba(214, 207, 196, 0.16);
+    --text-primary: #f5f2eb;      /* Soft warm white */
+    --text-secondary: #d6cfc4;    /* Sand */
+    --text-muted: #a39c93;
+    --shadow-color: rgba(0, 0, 0, 0.4);
+    --glass-bg: rgba(34, 32, 30, 0.7);
+    --glass-border: rgba(214, 207, 196, 0.05);
 }
 
 :root[data-theme="light"] {
-    --bg-primary: #f4f6fa;
-    --bg-secondary: #ffffff;
-    --bg-tertiary: #f8fafc;
-    --bg-input: #f1f5f9;
-    --border-color: rgba(0, 0, 0, 0.08);
-    --border-hover: rgba(0, 0, 0, 0.15);
-    --text-primary: #1e293b;
-    --text-secondary: #475569;
-    --text-muted: #64748b;
-    --shadow-color: rgba(15, 23, 42, 0.08);
-    --glass-bg: rgba(255, 255, 255, 0.8);
-    --glass-border: rgba(0, 0, 0, 0.05);
+    --bg-primary: #fcfbf9;       /* Ivory background */
+    --bg-secondary: #f6f2e8;     /* Soft warm cream card */
+    --bg-tertiary: #ede8dc;
+    --bg-input: #ffffff;
+    --border-color: rgba(120, 113, 108, 0.16);
+    --border-hover: rgba(120, 113, 108, 0.3);
+    --text-primary: #1e1d1b;      /* Deep obsidian grey */
+    --text-secondary: #57534e;    /* Stone text */
+    --text-muted: #878580;
+    --shadow-color: rgba(120, 113, 108, 0.08);
+    --glass-bg: rgba(246, 242, 232, 0.8);
+    --glass-border: rgba(120, 113, 108, 0.1);
 }
 
 :root {
     /* Brand Accents */
-    --brand-red: #9E1B2F;        /* ONGC Crimson Red */
-    --brand-red-hover: #b92137;
-    --brand-gold: #F2A900;       /* ONGC Gold */
-    --brand-gold-muted: rgba(242, 169, 0, 0.1);
+    --brand-red: #d97706;        /* Claude terracotta/bronze accent */
+    --brand-red-hover: #b45309;
+    --brand-gold: #cc5a37;       /* Claude deep orange */
+    --brand-gold-muted: rgba(204, 90, 55, 0.1);
     
     /* Utility colors */
     --success: #10b981;
@@ -56,7 +56,7 @@
     --border-radius-lg: 20px;
     
     /* Fonts */
-    --font-heading: 'Outfit', 'Inter', sans-serif;
+    --font-heading: 'Lora', 'Georgia', serif;
     --font-body: 'Inter', sans-serif;
     --font-mono: 'Courier New', Courier, monospace;
 }
@@ -1408,3 +1408,6 @@ body {
         box-shadow: 0 0 0 0 rgba(242, 169, 0, 0);
     }
 }
+
+
+

@@ -1,5 +1,5 @@
 // ==========================================================================
-// ONGC AI Assistant - JavaScript logic
+// AI Assistant - JavaScript logic
 // Tab Management, Chat Sessions, Voice API, Ingestion, & Analytics Feed
 // ==========================================================================
 
@@ -43,6 +43,8 @@ document.addEventListener("DOMContentLoaded", () => {
     const settingTemp = document.getElementById("setting-temp");
     const tempVal = document.getElementById("temp-val");
     const settingK = document.getElementById("setting-k");
+    
+
     const saveSettingsBtn = document.getElementById("save-settings-btn");
     const clearDbBtn = document.getElementById("clear-db-btn");
     
@@ -79,7 +81,7 @@ document.addEventListener("DOMContentLoaded", () => {
     let config = {
         model: localStorage.getItem("ongc_model") || "llama3.2:1b",
         temperature: parseFloat(localStorage.getItem("ongc_temp") || "0.0"),
-        k: parseInt(localStorage.getItem("ongc_k") || "5")
+        k: parseInt(localStorage.getItem("ongc_k") || "3")
     };
 
     // Update settings DOM controls
@@ -211,6 +213,7 @@ document.addEventListener("DOMContentLoaded", () => {
             viewTitle.textContent = "Configuration Panel";
             viewSubtitle.textContent = "Modify retrieval strategies and deep parameters";
             loadModels();
+
         }
     }
 
@@ -315,7 +318,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 <div class="welcome-icon">
                     <i class="fa-solid fa-microchip"></i>
                 </div>
-                <h3>Welcome to ONGC AI Knowledge Assistant</h3>
+                <h3>Welcome to AI Knowledge Assistant</h3>
                 <p>Query policies, rules, and manuals from our indexed PDF knowledge base. To get started, ask a question or check the suggestions below.</p>
                 
                 <div class="suggestions-grid">
@@ -390,7 +393,8 @@ document.addEventListener("DOMContentLoaded", () => {
                     question: text,
                     model: config.model,
                     temperature: config.temperature,
-                    session_id: activeSessionId
+                    session_id: activeSessionId,
+                    k: config.k
                 })
             });
             
@@ -404,28 +408,132 @@ document.addEventListener("DOMContentLoaded", () => {
                 return;
             }
 
-            const data = await res.json();
+            // Create a message bubble for streaming response
+            const messageRow = document.createElement("div");
+            messageRow.className = "message-row assistant";
             
-            // Save last exchange for feedback submission
+            const bubble = document.createElement("div");
+            bubble.className = "message-bubble";
+            
+            const messageTextEl = document.createElement("div");
+            messageTextEl.className = "message-text";
+            bubble.appendChild(messageTextEl);
+            messageRow.appendChild(bubble);
+            chatFeed.appendChild(messageRow);
+            chatFeed.scrollTop = chatFeed.scrollHeight;
+
+            let accumulatedAnswer = "";
+            let sources = [];
+            
+            const reader = res.body.getReader();
+            const decoder = new TextDecoder("utf-8");
+            let buffer = "";
+
+            while (true) {
+                const { value, done } = await reader.read();
+                if (done) break;
+                
+                buffer += decoder.decode(value, { stream: true });
+                const lines = buffer.split("\n");
+                
+                // Keep the last partial line in buffer
+                buffer = lines.pop(); 
+                
+                for (const line of lines) {
+                    if (!line.trim()) continue;
+                    try {
+                        const data = JSON.parse(line);
+                        if (data.type === "sources") {
+                            sources = data.sources;
+                        } else if (data.type === "token") {
+                            accumulatedAnswer += data.token;
+                            let formatted = escapeHTML(accumulatedAnswer);
+                            formatted = formatMarkdown(formatted);
+                            messageTextEl.innerHTML = formatted;
+                            chatFeed.scrollTop = chatFeed.scrollHeight;
+                        } else if (data.type === "error") {
+                            messageTextEl.innerHTML = `<span class="text-danger">${escapeHTML(data.error)}</span>`;
+                        }
+                    } catch (err) {
+                        console.error("Failed to parse streaming line:", line, err);
+                    }
+                }
+            }
+
+            // Render Sources if present
+            if (sources && sources.length > 0) {
+                const uniqueId = "sources_" + Date.now() + "_" + Math.floor(Math.random() * 1000);
+                let itemsHtml = "";
+                sources.forEach(src => {
+                    let fileLink = "";
+                    if (src.link) {
+                        fileLink = src.link;
+                    } else if (src.filename.toLowerCase().endsWith(".pdf")) {
+                        const pageNumMatch = src.page ? src.page.match(/\d+/) : null;
+                        const pageNum = pageNumMatch ? pageNumMatch[0] : 1;
+                        fileLink = `/docs/${encodeURIComponent(src.filename)}#page=${pageNum}`;
+                    }
+
+                    const filenameHtml = fileLink
+                        ? `<a href="${fileLink}" target="_blank" class="source-link" style="color: var(--brand-gold); text-decoration: underline; font-weight: 600;"><i class="fa-solid ${src.link ? 'fa-globe' : 'fa-file-pdf'}"></i> ${escapeHTML(src.filename)}</a>`
+                        : `<span class="filename"><i class="fa-solid fa-file-invoice"></i> ${escapeHTML(src.filename)}</span>`;
+
+                    itemsHtml += `
+                        <div class="source-item">
+                            <div class="source-meta">
+                                ${filenameHtml}
+                                <span class="page-num">${src.page}</span>
+                            </div>
+                            <div class="source-snippet">${escapeHTML(src.snippet)}</div>
+                        </div>
+                    `;
+                });
+                
+                const sourcesHtml = `
+                    <div class="sources-container">
+                        <div class="sources-toggle" onclick="toggleSources('${uniqueId}', this)">
+                            <i class="fa-solid fa-chevron-down"></i> Retrieved References (${sources.length})
+                        </div>
+                        <div class="sources-content" id="${uniqueId}">
+                            ${itemsHtml}
+                        </div>
+                    </div>
+                `;
+                const tempDiv = document.createElement("div");
+                tempDiv.innerHTML = sourcesHtml;
+                bubble.appendChild(tempDiv.firstElementChild);
+            }
+            
+            // Render feedback options
+            const feedbackHtml = `
+                <div class="feedback-actions">
+                    <span>Was this helpful?</span>
+                    <button class="feedback-btn up" onclick="handleFeedbackClick('up', this)" title="Helpful"><i class="fa-regular fa-thumbs-up"></i></button>
+                    <button class="feedback-btn down" onclick="handleFeedbackClick('down', this)" title="Unhelpful"><i class="fa-regular fa-thumbs-down"></i></button>
+                </div>
+            `;
+            const tempDivFeedback = document.createElement("div");
+            tempDivFeedback.innerHTML = feedbackHtml;
+            bubble.appendChild(tempDivFeedback.firstElementChild);
+            chatFeed.scrollTop = chatFeed.scrollHeight;
+            
+            // Save last exchange for feedback reference
             lastExchange = {
                 question: text,
-                answer: data.answer
+                answer: accumulatedAnswer
             };
-            
-            // Render AI response
-            renderMessage("assistant", data.answer, data.sources, true);
             
             // Append message history locally to session cache
             if (currentSession) {
                 if (!currentSession.history) currentSession.history = [];
                 currentSession.history.push({ role: "user", content: text });
-                currentSession.history.push({ role: "assistant", content: data.answer, sources: data.sources });
+                currentSession.history.push({ role: "assistant", content: accumulatedAnswer, sources: sources });
                 saveSessions();
             }
 
             // Auto Speech Synthesis if enabled
             if (textToSpeechEnabled) {
-                speakText(data.answer);
+                speakText(accumulatedAnswer);
             }
 
         } catch (e) {
@@ -478,10 +586,23 @@ document.addEventListener("DOMContentLoaded", () => {
                 const uniqueId = "sources_" + Date.now() + "_" + Math.floor(Math.random() * 1000);
                 let itemsHtml = "";
                 sources.forEach(src => {
+                    let fileLink = "";
+                    if (src.link) {
+                        fileLink = src.link;
+                    } else if (src.filename.toLowerCase().endsWith(".pdf")) {
+                        const pageNumMatch = src.page ? src.page.match(/\d+/) : null;
+                        const pageNum = pageNumMatch ? pageNumMatch[0] : 1;
+                        fileLink = `/docs/${encodeURIComponent(src.filename)}#page=${pageNum}`;
+                    }
+
+                    const filenameHtml = fileLink
+                        ? `<a href="${fileLink}" target="_blank" class="source-link" style="color: var(--brand-gold); text-decoration: underline; font-weight: 600;"><i class="fa-solid ${src.link ? 'fa-globe' : 'fa-file-pdf'}"></i> ${escapeHTML(src.filename)}</a>`
+                        : `<span class="filename"><i class="fa-solid fa-file-invoice"></i> ${escapeHTML(src.filename)}</span>`;
+
                     itemsHtml += `
                         <div class="source-item">
                             <div class="source-meta">
-                                <span class="filename"><i class="fa-solid fa-file-invoice"></i> ${src.filename}</span>
+                                ${filenameHtml}
                                 <span class="page-num">${src.page}</span>
                             </div>
                             <div class="source-snippet">${escapeHTML(src.snippet)}</div>
@@ -798,7 +919,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     const t = new Date(c.timestamp).toLocaleString();
                     el.innerHTML = `
                         <div class="comment-meta">
-                            <span><i class="fa-regular fa-user"></i> ONGC User</span>
+                            <span><i class="fa-regular fa-user"></i> User</span>
                             <span>${t}</span>
                         </div>
                         <div class="comment-text">"${escapeHTML(c.comment)}"</div>
@@ -904,7 +1025,7 @@ document.addEventListener("DOMContentLoaded", () => {
         recognition.onend = () => {
             isListening = false;
             voiceInputBtn.classList.remove("active");
-            chatInput.placeholder = "Ask about ONGC manuals...";
+            chatInput.placeholder = "Ask about the manuals...";
         };
         
         recognition.onerror = (e) => {
