@@ -1,3 +1,4 @@
+# pyrefly: ignore [missing-import]
 from langchain_llama import ChatOllama
 
 # Connect to the local Llama 3.2 model
