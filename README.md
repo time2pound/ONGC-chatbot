@@ -1,6 +1,6 @@
-# ONGC AI Knowledge Assistant
+# AI Knowledge Assistant
 
-An enterprise-grade, **fully offline** AI chatbot for querying ONGC internal documents (PDFs) using local Large Language Models via Ollama, RAG (Retrieval-Augmented Generation), and a premium web dashboard — built as part of the **ONGC Summer Internship 2025**.
+An enterprise-grade, **fully offline** AI chatbot for querying internal documents (PDFs) using local Large Language Models via Ollama, RAG (Retrieval-Augmented Generation), and a premium web dashboard.
 
 ---
 
@@ -23,7 +23,7 @@ An enterprise-grade, **fully offline** AI chatbot for querying ONGC internal doc
 ## Project Structure
 
 ```
-ONGC_CHATBOT/
+AI_CHATBOT/
 │
 ├── app/                        # Core application modules
 │   ├── __init__.py
@@ -49,7 +49,7 @@ ONGC_CHATBOT/
 │   └── app.js                  # Frontend logic (chat, sessions, ingestion)
 │
 ├── docs/                       # Indexed PDF documents (mounted volume)
-│   └── ONGC manual.pdf
+│   └── sample_manual.pdf
 │
 ├── chroma_db/                  # ChromaDB persistent vector store
 │
@@ -88,7 +88,7 @@ ollama pull gemma3:1b          # Alternative
 
 ```bash
 git clone <your-repo-url>
-cd ONGC_CHATBOT
+cd AI_CHATBOT
 pip install -r requirements.txt
 ```
 
@@ -149,7 +149,7 @@ docker-compose up --build
 ```bash
 curl -X POST http://127.0.0.1:8000/api/chat \
   -H "Content-Type: application/json" \
-  -d '{"question": "What is the PMC Section?", "model": "llama3.2:1b"}'
+  -d '{"question": "What is the policy guidelines?", "model": "llama3.2:1b"}'
 ```
 
 ---
@@ -185,6 +185,5 @@ Backend defaults live in [`app/config.py`](app/config.py).
 
 ## Developed By
 
-**ONGC Summer Internship 2025**
-Policy Monitoring & Control (PMC) Section
-Corporate Materials Management, New Delhi
+**Enterprise AI Assistant Project**
+

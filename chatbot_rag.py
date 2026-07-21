@@ -45,7 +45,7 @@ llm = ChatOllama(
 )
 
 print("\n===========================================")
-print("        ONGC AI ASSISTANT")
+print("        AI KNOWLEDGE ASSISTANT")
 print("Type 'exit' to quit")
 print("===========================================")
 
@@ -86,7 +86,7 @@ while True:
         )
 
         prompt = f"""
-You are an expert ONGC AI Assistant.
+You are an expert AI Knowledge Assistant.
 
 Answer ONLY using the information given in the context.
 

@@ -1,14 +1,15 @@
-# ONGC Summer Internship
+# AI Chatbot Development Plan
 # AI Chatbot Development using Ollama, OpenWebUI & RAG
 
 ---
 
-# Internship Duration
+# Development Duration
 **4 Weeks (20 Working Days)**
 
 ## Objective
 
-Build an enterprise-grade AI chatbot capable of answering questions from ONGC documents using Local Large Language Models (LLMs), Retrieval-Augmented Generation (RAG), and OpenWebUI.
+Build an enterprise-grade AI chatbot capable of answering questions from internal documents using Local Large Language Models (LLMs), Retrieval-Augmented Generation (RAG), and OpenWebUI.
+
 
 By the end of this internship, interns should be able to:
 
@@ -63,7 +64,7 @@ By the end of this internship, interns should be able to:
 # Folder Structure
 
 ```text
-ONGC-Chatbot
+AI-Chatbot
 │
 ├── app
 │   ├── backend

@@ -1,6 +1,6 @@
 from langchain_community.document_loaders import PyPDFLoader
 
-loader = PyPDFLoader("docs/ONGC manual.pdf")
+loader = PyPDFLoader("docs/sample_manual.pdf")
 
 docs = loader.load()
 

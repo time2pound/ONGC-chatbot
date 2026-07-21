@@ -79,9 +79,9 @@ document.addEventListener("DOMContentLoaded", () => {
     
     // Load local storage settings
     let config = {
-        model: localStorage.getItem("ongc_model") || "llama3.2:1b",
-        temperature: parseFloat(localStorage.getItem("ongc_temp") || "0.0"),
-        k: parseInt(localStorage.getItem("ongc_k") || "3")
+        model: localStorage.getItem("ai_model") || localStorage.getItem("ongc_model") || "llama3.2:1b",
+        temperature: parseFloat(localStorage.getItem("ai_temp") || localStorage.getItem("ongc_temp") || "0.0"),
+        k: parseInt(localStorage.getItem("ai_k") || localStorage.getItem("ongc_k") || "3")
     };
 
     // Update settings DOM controls
@@ -110,7 +110,7 @@ document.addEventListener("DOMContentLoaded", () => {
             // Check if active model exists, if not, choose first
             if (availableModels.length > 0 && !availableModels.includes(config.model)) {
                 config.model = availableModels[0];
-                localStorage.setItem("ongc_model", config.model);
+                localStorage.setItem("ai_model", config.model);
             }
             // Always update the header label to reflect loaded models
             chatActiveModelLabel.textContent = config.model;
@@ -136,9 +136,9 @@ document.addEventListener("DOMContentLoaded", () => {
         config.temperature = parseFloat(settingTemp.value);
         config.k = parseInt(settingK.value);
         
-        localStorage.setItem("ongc_model", config.model);
-        localStorage.setItem("ongc_temp", config.temperature);
-        localStorage.setItem("ongc_k", config.k);
+        localStorage.setItem("ai_model", config.model);
+        localStorage.setItem("ai_temp", config.temperature);
+        localStorage.setItem("ai_k", config.k);
         
         chatActiveModelLabel.textContent = config.model;
         showBanner("Configuration saved successfully!", "success", "settings-view");
@@ -148,6 +148,7 @@ document.addEventListener("DOMContentLoaded", () => {
     clearDbBtn.addEventListener("click", () => {
         if (confirm("Are you sure you want to clear all chat sessions? This cannot be undone.")) {
             sessions = [];
+            localStorage.removeItem("ai_sessions");
             localStorage.removeItem("ongc_sessions");
             activeSessionId = null;
             renderSessions();
@@ -222,7 +223,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // ==========================================
     
     function loadSessions() {
-        const cached = localStorage.getItem("ongc_sessions");
+        const cached = localStorage.getItem("ai_sessions") || localStorage.getItem("ongc_sessions");
         if (cached) {
             sessions = JSON.parse(cached);
         } else {
@@ -238,7 +239,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     function saveSessions() {
-        localStorage.setItem("ongc_sessions", JSON.stringify(sessions));
+        localStorage.setItem("ai_sessions", JSON.stringify(sessions));
     }
 
     function renderSessions() {
